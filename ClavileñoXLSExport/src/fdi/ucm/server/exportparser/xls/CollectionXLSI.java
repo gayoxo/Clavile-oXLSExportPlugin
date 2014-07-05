@@ -100,7 +100,10 @@ public class CollectionXLSI {
         		
         		String Value = "";
             	if (j!=0)
-            		Value=ListaElementos.get(j-1).getName();
+            		{
+            		CompleteElementType TmpEle = ListaElementos.get(j-1);
+            		Value=pathFather(TmpEle);
+            		}
             	
             	if (Value.length()<32767)
             	{
@@ -159,15 +162,22 @@ public class CollectionXLSI {
             		ArrayList<CompleteElement> temp = ListaClave.get(c);
             		if (temp!=null)
             		{
-            			//TODO
-//            		StringBuffer SB=new StringBuffer();
-//            		for (CompleteElement completeElement : temp) {
-//						
-//					}
-            		Value="YA lo se";
+            		for (CompleteElement completeElement : temp) {
+						if (completeElement instanceof CompleteTextElement)
+							Value=Value+" " +((CompleteTextElement)completeElement).getValue();
+						else if (completeElement instanceof CompleteLinkElement)
+							Value=Value+" " +"$"+((CompleteLinkElement)completeElement).getValue().getClavilenoid();
+						else if (completeElement instanceof CompleteResourceElementURL)
+							Value=Value+" "+((CompleteResourceElementURL)completeElement).getValue();
+						else if (completeElement instanceof CompleteResourceElementFile)
+							Value=Value+" "+((CompleteResourceElementFile)completeElement).getValue().getPath();
+							
+					}
             		}
-            		
-            		
+            		}
+            	else
+            		{
+            		Value=Doc.getClavilenoid()+"";
             		}
             	 
             	if (Value.length()>=32767)
@@ -176,9 +186,7 @@ public class CollectionXLSI {
             		cL.getLogLines().add("Temaño de Texto en Valor en elemento " + Value + " excesivo, no debe superar los 32767 caracteres, columna ignorada");
             	}
                 /*Creamos la celda a partir de la fila actual*/
-                Cell celda = fila.createCell(c);
-               
-                	
+                Cell celda = fila.createCell(c);               	
                 	if (c==0)
                 		celda.setCellValue(Value);
                 	else
@@ -259,7 +267,8 @@ public class CollectionXLSI {
 			  CompleteGrammar G1 = new CompleteGrammar(new Long(id),"Grammar"+i, i+"", CC);
 			  
 			  ArrayList<CompleteDocuments> CD=new ArrayList<CompleteDocuments>();
-			  int docsN=(new Random()).nextInt(10);
+			  int docsN=(new Random()).nextInt(5);
+			  docsN=docsN+5;
 			for (int j = 0; j < docsN; j++) {
 				CompleteDocuments CDDD=new CompleteDocuments(new Long(id), CC, G1, "", "");
 				CC.getEstructuras().add(CDDD);
@@ -269,12 +278,12 @@ public class CollectionXLSI {
 			  
 			  id++;
 			  for (int j = 0; j < 5; j++) {
-				  CompleteElementType CX = new CompleteElementType(new Long(id),"Struc "+(i*10+j), G1);
+				  CompleteElementType CX = new CompleteElementType(new Long(id),"Structure "+(i*10+j), G1);
 				  id++;
 				G1.getSons().add(CX);
 			}
 			  for (int j = 0; j < 5; j++) {
-				  CompleteTextElementType CX = new CompleteTextElementType(new Long(id),"Text "+(i*10+j), G1);
+				  CompleteTextElementType CX = new CompleteTextElementType(new Long(id),"Texto "+(i*10+j), G1);
 				  id++;
 				G1.getSons().add(CX);
 				
@@ -282,7 +291,7 @@ public class CollectionXLSI {
 					boolean docrep=(new Random()).nextBoolean();
 					if (docrep)
 						{
-						CompleteTextElement CTE=new CompleteTextElement(new Long(id), CX, "ValorText "+(i*10+j));
+						CompleteTextElement CTE=new CompleteTextElement(new Long(id), CX, "Texto "+(i*10+j));
 						id++;
 						completeDocuments.getDescription().add(CTE);
 						}
@@ -307,7 +316,7 @@ public class CollectionXLSI {
 				}
 			}
 			  for (int j = 0; j < 5; j++) {
-				  CompleteResourceElementType CX = new CompleteResourceElementType(new Long(id),"Resour "+(i*10+j), G1);
+				  CompleteResourceElementType CX = new CompleteResourceElementType(new Long(id),"Resource "+(i*10+j), G1);
 				  id++;
 				G1.getSons().add(CX);
 				
@@ -319,10 +328,10 @@ public class CollectionXLSI {
 						boolean URL=(new Random()).nextBoolean();
 						CompleteResourceElement CTE;
 						if (URL)
-							CTE=new CompleteResourceElementURL(new Long(id), CX, "ValorText "+(i*10+j));
+							CTE=new CompleteResourceElementURL(new Long(id), CX, "URL "+(i*10+j));
 						else 
 							{
-							CompleteFile FF = new CompleteFile(new Long(id), "ValorText "+(i*10+j), CC);
+							CompleteFile FF = new CompleteFile(new Long(id), "Path File "+(i*10+j), CC);
 							CC.getSectionValues().add(FF);
 							id++;
 							CTE=new CompleteResourceElementFile(new Long(id), CX, FF);
@@ -343,5 +352,19 @@ public class CollectionXLSI {
 	    }
 
 
-
+	/**
+	 *  Retorna el Texto que representa al path.
+	 *  @return Texto cadena para el elemento
+	 */
+	public static String pathFather(CompleteStructure entrada)
+	{
+		String DataShow;
+		if (entrada instanceof CompleteElementType)
+			DataShow= ((CompleteElementType) entrada).getName();
+		else DataShow= "*";
+		
+		if (entrada.getFather()!=null)
+			return pathFather(entrada.getFather())+"/"+DataShow;
+		else return entrada.getCollectionFather().getNombre()+"/"+DataShow;
+	}
 }
