@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -20,6 +21,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import fdi.ucm.server.modelComplete.collection.CompleteCollection;
 import fdi.ucm.server.modelComplete.collection.CompleteCollectionLog;
 import fdi.ucm.server.modelComplete.collection.document.CompleteDocuments;
+import fdi.ucm.server.modelComplete.collection.document.CompleteElement;
 import fdi.ucm.server.modelComplete.collection.document.CompleteFile;
 import fdi.ucm.server.modelComplete.collection.document.CompleteLinkElement;
 import fdi.ucm.server.modelComplete.collection.document.CompleteResourceElement;
@@ -84,50 +86,113 @@ public class CollectionXLSI {
        
         if (!Errores)
         {
+        	
+        int row=0;
+        int Column=0;
+        int columnsMax=ListaElementos.size();
+        HashMap<Long, Integer> clave=new HashMap<Long, Integer>();		
+        
+        for (int i = 0; i < 2; i++) {
+        	Row fila = hoja.createRow(row);
+        	row++;
+        	
+        	for (int j = 0; j < columnsMax; j++) {
+        		
+        		String Value = "";
+            	if (j!=0)
+            		Value=ListaElementos.get(j-1).getName();
+            	
+            	if (Value.length()<32767)
+            	{
+            		Cell celda = fila.createCell(j);
+            		
+            		
+            	String Value2 = "";
+            	if (j!=0)
+            		{
+            		Value2=ListaElementos.get(j-1).getClavilenoid().toString();
+            		if (i==0)
+            			clave.put(ListaElementos.get(j-1).getClavilenoid(), Column);
+            		}
+            	
+            	if(i==0){
+            		Column++;
+            		celda.setCellValue(Value);
+            	}else if (i==1){
+            		celda.setCellValue(Value2);
+            	}
+            }
+           }
+		}	
+        	
         /*Hacemos un ciclo para inicializar los valores de 10 filas de celdas*/
-        for(int f=0;f<(salvar.getEstructuras().size()+2);f++){
+        for(int f=0;f<salvar.getEstructuras().size();f++){
             /*La clase Row nos permitirá crear las filas*/
-            Row fila = hoja.createRow(f);
+            Row fila = hoja.createRow(row);
+            row++;
 
+            CompleteDocuments Doc=salvar.getEstructuras().get(f);
+            HashMap<Integer, ArrayList<CompleteElement>> ListaClave=new HashMap<Integer, ArrayList<CompleteElement>>();
+            
+            for (CompleteElement elem : Doc.getDescription()) {
+				Integer val=clave.get(elem.getHastype().getClavilenoid());
+				if (val!=null)
+					{
+					ArrayList<CompleteElement> Lis=ListaClave.get(val);
+					if (Lis==null)
+						{
+						Lis=new ArrayList<CompleteElement>();
+						}
+					Lis.add(elem);
+					ListaClave.put(val, Lis);
+					}
+			}
+            
+            
+            
             /*Cada fila tendrá 5 celdas de datos*/
-            for(int c=0;c<=ListaElementos.size();c++){
+            for(int c=0;c<Column;c++){
             	
             	String Value = "";
             	if (c!=0)
-            		Value=ListaElementos.get(c-1).getName();
-            	
-            	String Value2 = "";
-            	if (c!=0)
-            		Value2=ListaElementos.get(c-1).getClavilenoid().toString();
-	
-            	if (Value.length()<32767)
+            		{
+            		ArrayList<CompleteElement> temp = ListaClave.get(c);
+            		if (temp!=null)
+            		{
+            			//TODO
+//            		StringBuffer SB=new StringBuffer();
+//            		for (CompleteElement completeElement : temp) {
+//						
+//					}
+            		Value="YA lo se";
+            		}
+            		
+            		
+            		}
+            	 
+            	if (Value.length()>=32767)
             	{
+            		Value="";
+            		cL.getLogLines().add("Temaño de Texto en Valor en elemento " + Value + " excesivo, no debe superar los 32767 caracteres, columna ignorada");
+            	}
                 /*Creamos la celda a partir de la fila actual*/
                 Cell celda = fila.createCell(c);
-                
-                /*Si la fila es la número 0, estableceremos los encabezados*/
-                if(f==0){
-                	
-                		celda.setCellValue(Value);
-                }else if (f==1){
-                		celda.setCellValue(Value2);
-                }else{
+               
                 	
                 	if (c==0)
-                		celda.setCellValue("Valor Documento "+(f-2));
+                		celda.setCellValue(Value);
                 	else
-                		 celda.setCellValue("Valor celda "+(c-1)+","+(f-2));
+                		 celda.setCellValue(Value);
                     /*Si no es la primera fila establecemos un valor*/
                 	//32.767
-                   
-                }
+
                 
             	}
-            	else 
-            		cL.getLogLines().add("Temaño de Texto en Structura " + Value + " excesivo, no debe superar los 32767 caracteres, columna ignorada");
+
+            		
             		
             }
-        }
+        
         
         
         /*Escribimos en el libro*/
