@@ -56,181 +56,355 @@ public class CollectionXLSI {
         
         /*Se crea el libro de excel usando el objeto de tipo Workbook*/
         Workbook libro = new HSSFWorkbook();
+        
         /*Se inicializa el flujo de datos con el archivo xls*/
         FileOutputStream archivo = new FileOutputStream(archivoXLS);
         
         /*Utilizamos la clase Sheet para crear una nueva hoja de trabajo dentro del libro que creamos anteriormente*/
         
+        HashMap<Long, Integer> clave=new HashMap<Long, Integer>();	
         
-        Sheet hoja;
+//        Sheet hoja;
         
-        if (!salvar.getName().isEmpty())
-        	 hoja = libro.createSheet(salvar.getName());
-        else hoja = libro.createSheet();
-        
-        ArrayList<CompleteElementType> ListaElementos=generaLista(salvar.getMetamodelGrammar());
-        
-        boolean Errores=false;
-        
-        if (ListaElementos.size()>255)
-        	{
-        	cL.getLogLines().add("Tamaño de estructura demasiado grande para exportar a xls");
-        	Errores=true;
-        	}
-        	
-        if (salvar.getEstructuras().size()+1>65536)
-    	{
-    	cL.getLogLines().add("Tamaño de los objetos demasiado grande para exportar a xls");
-    	Errores=true;
-    	}
-       
-        if (!Errores)
-        {
-        	
-        int row=0;
-        int Column=0;
-        int columnsMax=ListaElementos.size();
-        HashMap<Long, Integer> clave=new HashMap<Long, Integer>();		
-        
-        for (int i = 0; i < 2; i++) {
-        	Row fila = hoja.createRow(row);
-        	row++;
-        	
-        	for (int j = 0; j < columnsMax; j++) {
-        		
-        		String Value = "";
-            	if (j!=0)
-            		{
-            		CompleteElementType TmpEle = ListaElementos.get(j-1);
-            		Value=pathFather(TmpEle);
-            		}
-            	
-            	if (Value.length()<32767)
-            	{
-            		Cell celda = fila.createCell(j);
-            		
-            		
-            	String Value2 = "";
-            	if (j!=0)
-            		{
-            		Value2=ListaElementos.get(j-1).getClavilenoid().toString();
-            		if (i==0)
-            			clave.put(ListaElementos.get(j-1).getClavilenoid(), Column);
-            		}
-            	
-            	if(i==0){
-            		Column++;
-            		celda.setCellValue(Value);
-            	}else if (i==1){
-            		celda.setCellValue(Value2);
-            	}
-            }
-           }
-		}	
-        	
-        /*Hacemos un ciclo para inicializar los valores de filas de celdas*/
-        for(int f=0;f<salvar.getEstructuras().size();f++){
-            /*La clase Row nos permitirá crear las filas*/
-            Row fila = hoja.createRow(row);
-            row++;
-
-            CompleteDocuments Doc=salvar.getEstructuras().get(f);
-            HashMap<Integer, ArrayList<CompleteElement>> ListaClave=new HashMap<Integer, ArrayList<CompleteElement>>();
-            
-            for (CompleteElement elem : Doc.getDescription()) {
-				Integer val=clave.get(elem.getHastype().getClavilenoid());
-				if (val!=null)
-					{
-					ArrayList<CompleteElement> Lis=ListaClave.get(val);
-					if (Lis==null)
-						{
-						Lis=new ArrayList<CompleteElement>();
-						}
-					Lis.add(elem);
-					ListaClave.put(val, Lis);
-					}
-			}
-            
-            
-            
-            /*Cada fila tendrá celdas de datos*/
-            for(int c=0;c<Column;c++){
-            	
-            	String Value = "";
-            	if (c!=0)
-            		{
-            		ArrayList<CompleteElement> temp = ListaClave.get(c);
-            		if (temp!=null)
-            		{
-            		for (CompleteElement completeElement : temp) {
-            			if (!Value.isEmpty())
-            				Value=Value+" "; 
-						if (completeElement instanceof CompleteTextElement)
-							Value=Value+((CompleteTextElement)completeElement).getValue();
-						else if (completeElement instanceof CompleteLinkElement)
-							Value=Value+((CompleteLinkElement)completeElement).getValue().getClavilenoid();
-						else if (completeElement instanceof CompleteResourceElementURL)
-							Value=Value+((CompleteResourceElementURL)completeElement).getValue();
-						else if (completeElement instanceof CompleteResourceElementFile)
-							Value=Value+((CompleteResourceElementFile)completeElement).getValue().getPath();
-							
-					}
-            		}
-            		}
-            	else
-            		{
-            		Value=Doc.getClavilenoid()+"";
-            		}
-            	 
-            	if (Value.length()>=32767)
-            	{
-            		Value="";
-            		cL.getLogLines().add("Temaño de Texto en Valor en elemento " + Value + " excesivo, no debe superar los 32767 caracteres, columna ignorada");
-            	}
-                /*Creamos la celda a partir de la fila actual*/
-                Cell celda = fila.createCell(c);               	
-                	if (c==0)
-                		celda.setCellValue(Value);
-                	else
-                		 celda.setCellValue(Value);
-                    /*Si no es la primera fila establecemos un valor*/
-                	//32.767
-
-                
-            	}
-
-            		
-            		
-            }
+        for (CompleteGrammar row : salvar.getMetamodelGrammar()) {
+			processGrammar(libro,row,clave,cL,salvar.getEstructuras(),soloEstructura);
+		}
         
         
-        
-        /*Escribimos en el libro*/
+//        if (!salvar.getName().isEmpty())
+//        	 hoja = libro.createSheet(salvar.getName());
+//        else hoja = libro.createSheet();
+//  
+//        
+//        ArrayList<CompleteElementType> ListaElementos=generaLista(salvar.getMetamodelGrammar());
+//        
+//        boolean Errores=false;
+//        
+//        if (ListaElementos.size()>255)
+//        	{
+//        	cL.getLogLines().add("Tamaño de estructura demasiado grande para exportar a xls");
+//        	Errores=true;
+//        	}
+//        	
+//        if (salvar.getEstructuras().size()+1>65536)
+//    	{
+//    	cL.getLogLines().add("Tamaño de los objetos demasiado grande para exportar a xls");
+//    	Errores=true;
+//    	}
+//       
+//        if (!Errores)
+//        {
+//        	
+//        int row=0;
+//        int Column=0;
+//        int columnsMax=ListaElementos.size();
+//       	
+//        
+//        for (int i = 0; i < 2; i++) {
+//        	Row fila = hoja.createRow(row);
+//        	row++;
+//        	
+//        	for (int j = 0; j < columnsMax; j++) {
+//        		
+//        		String Value = "";
+//            	if (j!=0)
+//            		{
+//            		CompleteElementType TmpEle = ListaElementos.get(j-1);
+//            		Value=pathFather(TmpEle);
+//            		}
+//            	
+//            	if (Value.length()<32767)
+//            	{
+//            		Cell celda = fila.createCell(j);
+//            		
+//            		
+//            	String Value2 = "";
+//            	if (j!=0)
+//            		{
+//            		Value2=ListaElementos.get(j-1).getClavilenoid().toString();
+//            		if (i==0)
+//            			clave.put(ListaElementos.get(j-1).getClavilenoid(), Column);
+//            		}
+//            	
+//            	if(i==0){
+//            		Column++;
+//            		celda.setCellValue(Value);
+//            	}else if (i==1){
+//            		celda.setCellValue(Value2);
+//            	}
+//            }
+//           }
+//		}	
+//        	
+//        /*Hacemos un ciclo para inicializar los valores de filas de celdas*/
+//        for(int f=0;f<salvar.getEstructuras().size();f++){
+//            /*La clase Row nos permitirá crear las filas*/
+//            Row fila = hoja.createRow(row);
+//            row++;
+//
+//            CompleteDocuments Doc=salvar.getEstructuras().get(f);
+//            HashMap<Integer, ArrayList<CompleteElement>> ListaClave=new HashMap<Integer, ArrayList<CompleteElement>>();
+//            
+//            for (CompleteElement elem : Doc.getDescription()) {
+//				Integer val=clave.get(elem.getHastype().getClavilenoid());
+//				if (val!=null)
+//					{
+//					ArrayList<CompleteElement> Lis=ListaClave.get(val);
+//					if (Lis==null)
+//						{
+//						Lis=new ArrayList<CompleteElement>();
+//						}
+//					Lis.add(elem);
+//					ListaClave.put(val, Lis);
+//					}
+//			}
+//            
+//            
+//            
+//            /*Cada fila tendrá celdas de datos*/
+//            for(int c=0;c<Column;c++){
+//            	
+//            	String Value = "";
+//            	if (c!=0)
+//            		{
+//            		ArrayList<CompleteElement> temp = ListaClave.get(c);
+//            		if (temp!=null)
+//            		{
+//            		for (CompleteElement completeElement : temp) {
+//            			if (!Value.isEmpty())
+//            				Value=Value+" "; 
+//						if (completeElement instanceof CompleteTextElement)
+//							Value=Value+((CompleteTextElement)completeElement).getValue();
+//						else if (completeElement instanceof CompleteLinkElement)
+//							Value=Value+((CompleteLinkElement)completeElement).getValue().getClavilenoid();
+//						else if (completeElement instanceof CompleteResourceElementURL)
+//							Value=Value+((CompleteResourceElementURL)completeElement).getValue();
+//						else if (completeElement instanceof CompleteResourceElementFile)
+//							Value=Value+((CompleteResourceElementFile)completeElement).getValue().getPath();
+//							
+//					}
+//            		}
+//            		}
+//            	else
+//            		{
+//            		Value=Doc.getClavilenoid()+"";
+//            		}
+//            	 
+//            	if (Value.length()>=32767)
+//            	{
+//            		Value="";
+//            		cL.getLogLines().add("Temaño de Texto en Valor en elemento " + Value + " excesivo, no debe superar los 32767 caracteres, columna ignorada");
+//            	}
+//                /*Creamos la celda a partir de la fila actual*/
+//                Cell celda = fila.createCell(c);               	
+//                	if (c==0)
+//                		celda.setCellValue(Value);
+//                	else
+//                		 celda.setCellValue(Value);
+//                    /*Si no es la primera fila establecemos un valor*/
+//                	//32.767
+//
+//                
+//            	}
+//
+//            		
+//            		
+//            }
+//        
+//        
+//        
+//        /*Escribimos en el libro*/
         libro.write(archivo);
         /*Cerramos el flujo de datos*/
         archivo.close();
         /*Y abrimos el archivo con la clase Desktop*/
-////        Desktop.getDesktop().open(archivoXLS);
+//        Desktop.getDesktop().open(archivoXLS);
 		return rutaArchivo;
-        }
-        else 
-        	{
-        	 libro.write(archivo);
-        	archivo.close();
-        	return "";
-        	}
+//        }
+//        else 
+//        	{
+//        	 libro.write(archivo);
+//        	archivo.close();
+//        	return "";
+//        	}
+        
+
+        
+        
 	}
 	
-	  private static ArrayList<CompleteElementType> generaLista(
-			List<CompleteGrammar> metamodelGrammar) {
-		  ArrayList<CompleteElementType> ListaElementos = new ArrayList<CompleteElementType>();
-		  for (CompleteGrammar completegramar : metamodelGrammar) {
-			ListaElementos.addAll(generaLista(completegramar));
-		}
-		return ListaElementos;
+	  private static void processGrammar(Workbook libro, CompleteGrammar grammar,
+			HashMap<Long, Integer> clave, CompleteCollectionLog cL, List<CompleteDocuments> list, boolean soloEstructura) {
+		  
+		   Sheet hoja;
+		if (!grammar.getNombre().isEmpty())
+	        	 hoja = libro.createSheet(grammar.getNombre());
+	        else hoja = libro.createSheet();
+	  
+	        
+	        List<CompleteElementType> ListaElementos=generaLista(grammar);
+	        
+
+	        if (ListaElementos.size()>255)
+	        	{
+	        	cL.getLogLines().add("Tamaño de estructura demasiado grande para exportar a xls para gramatica: " + grammar.getNombre() +" solo 255 estructuras seran grabadas, divide en gramaticas mas simples");
+	        	ListaElementos=ListaElementos.subList(0, 254);
+	        	}
+	        
+	        List<CompleteDocuments> ListaDocumentos=generaDocs(list,grammar);
+	      
+	        if (ListaDocumentos.size()+1>65536)
+	    	{
+	    	cL.getLogLines().add("Tamaño de los objetos demasiado grande para exportar a xls");
+	    	ListaDocumentos=ListaDocumentos.subList(0, 65536);
+	    	}
+
+	        	
+	        int row=0;
+	        int Column=0;
+	        int columnsMax=ListaElementos.size();
+	       	
+	        
+	        for (int i = 0; i < 2; i++) {
+	        	Row fila = hoja.createRow(row);
+	        	row++;
+	        	
+	        	for (int j = 0; j <= columnsMax; j++) {
+	        		
+	        		String Value = "";
+	            	if (j!=0)
+	            		{
+	            		CompleteElementType TmpEle = ListaElementos.get(j-1);
+	            		Value=pathFather(TmpEle);
+	            		}
+	            	
+	            	if (Value.length()<32767)
+	            	{
+	            		Cell celda = fila.createCell(j);
+	            		
+	            		
+	            	String Value2 = "";
+	            	if (j!=0)
+	            		{
+	            		Value2=ListaElementos.get(j-1).getClavilenoid().toString();
+	            		if (i==0)
+	            			clave.put(ListaElementos.get(j-1).getClavilenoid(), Column);
+	            		}
+	            	
+	            	if(i==0){
+	            		Column++;
+	            		celda.setCellValue(Value);
+	            	}else if (i==1){
+	            		celda.setCellValue(Value2);
+	            	}
+	            }
+	           }
+			}	
+	        
+	        
+	        if (!soloEstructura)
+	        {
+	        /*Hacemos un ciclo para inicializar los valores de filas de celdas*/
+	        for(int f=0;f<ListaDocumentos.size();f++){
+	            /*La clase Row nos permitirá crear las filas*/
+	            Row fila = hoja.createRow(row);
+	            row++;
+
+	            CompleteDocuments Doc=ListaDocumentos.get(f);
+	            HashMap<Integer, ArrayList<CompleteElement>> ListaClave=new HashMap<Integer, ArrayList<CompleteElement>>();
+	            
+	            for (CompleteElement elem : Doc.getDescription()) {
+					Integer val=clave.get(elem.getHastype().getClavilenoid());
+					if (val!=null)
+						{
+						ArrayList<CompleteElement> Lis=ListaClave.get(val);
+						if (Lis==null)
+							{
+							Lis=new ArrayList<CompleteElement>();
+							}
+						Lis.add(elem);
+						ListaClave.put(val, Lis);
+						}
+				}
+	            
+	            
+	            
+	            /*Cada fila tendrá celdas de datos*/
+	            for(int c=0;c<Column;c++){
+	            	
+	            	String Value = "";
+	            	if (c!=0)
+	            		{
+	            		ArrayList<CompleteElement> temp = ListaClave.get(c);
+	            		if (temp!=null)
+	            		{
+	            		for (CompleteElement completeElement : temp) {
+	            			if (!Value.isEmpty())
+	            				Value=Value+" "; 
+							if (completeElement instanceof CompleteTextElement)
+								Value=Value+((CompleteTextElement)completeElement).getValue();
+							else if (completeElement instanceof CompleteLinkElement)
+								Value=Value+((CompleteLinkElement)completeElement).getValue().getClavilenoid();
+							else if (completeElement instanceof CompleteResourceElementURL)
+								Value=Value+((CompleteResourceElementURL)completeElement).getValue();
+							else if (completeElement instanceof CompleteResourceElementFile)
+								Value=Value+((CompleteResourceElementFile)completeElement).getValue().getPath();
+								
+						}
+	            		}
+	            		}
+	            	else
+	            		{
+	            		Value=Doc.getClavilenoid()+"";
+	            		}
+	            	 
+	            	if (Value.length()>=32767)
+	            	{
+	            		Value="";
+	            		cL.getLogLines().add("Temaño de Texto en Valor en elemento " + Value + " excesivo, no debe superar los 32767 caracteres, columna ignorada");
+	            	}
+	                /*Creamos la celda a partir de la fila actual*/
+	                Cell celda = fila.createCell(c);               	
+	                	if (c==0)
+	                		celda.setCellValue(Value);
+	                	else
+	                		 celda.setCellValue(Value);
+	                    /*Si no es la primera fila establecemos un valor*/
+	                	//32.767
+
+	                
+	            	}
+
+	            		
+	            		
+	            }
+	        
+	        }
+	        
+	       
+		
 	}
 
-	private static Collection<CompleteElementType> generaLista(
+	private static ArrayList<CompleteDocuments> generaDocs(
+			List<CompleteDocuments> list, CompleteGrammar grammar) {
+		ArrayList<CompleteDocuments> ListaDoc=new ArrayList<CompleteDocuments>();
+		for (CompleteDocuments completeDocuments : list) {
+			if (completeDocuments.getDocument()==grammar)
+				ListaDoc.add(completeDocuments);
+		}
+		return ListaDoc;
+	}
+
+//	private static ArrayList<CompleteElementType> generaLista(
+//			List<CompleteGrammar> metamodelGrammar) {
+//		  ArrayList<CompleteElementType> ListaElementos = new ArrayList<CompleteElementType>();
+//		  for (CompleteGrammar completegramar : metamodelGrammar) {
+//			ListaElementos.addAll(generaLista(completegramar));
+//		}
+//		return ListaElementos;
+//	}
+
+	private static ArrayList<CompleteElementType> generaLista(
 			CompleteGrammar completegramar) {
 		 ArrayList<CompleteElementType> ListaElementos = new ArrayList<CompleteElementType>();
 		 for (CompleteStructure completeelem : completegramar.getSons()) {
@@ -349,7 +523,7 @@ public class CollectionXLSI {
 		 
 		  
 		  
-		  processCompleteCollection(new CompleteCollectionLog(), CC, true, System.getProperty("user.home"));
+		  processCompleteCollection(new CompleteCollectionLog(), CC, false, System.getProperty("user.home"));
 		  
 	    }
 

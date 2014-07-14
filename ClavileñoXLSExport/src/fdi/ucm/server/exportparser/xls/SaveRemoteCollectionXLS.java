@@ -56,7 +56,7 @@ public class SaveRemoteCollectionXLS extends SaveCollection {
 		if (Parametros==null)
 		{
 			ArrayList<ImportExportPair> ListaCampos=new ArrayList<ImportExportPair>();
-			ListaCampos.add(new ImportExportPair(ImportExportDataEnum.Boolean, "Include Documents Data"));
+			ListaCampos.add(new ImportExportPair(ImportExportDataEnum.Boolean, "Exclude Documents Data"));
 			Parametros=ListaCampos;
 			return ListaCampos;
 		}
