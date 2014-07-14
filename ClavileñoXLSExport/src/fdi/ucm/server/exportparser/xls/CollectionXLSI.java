@@ -128,7 +128,7 @@ public class CollectionXLSI {
            }
 		}	
         	
-        /*Hacemos un ciclo para inicializar los valores de 10 filas de celdas*/
+        /*Hacemos un ciclo para inicializar los valores de filas de celdas*/
         for(int f=0;f<salvar.getEstructuras().size();f++){
             /*La clase Row nos permitirá crear las filas*/
             Row fila = hoja.createRow(row);
@@ -153,7 +153,7 @@ public class CollectionXLSI {
             
             
             
-            /*Cada fila tendrá 5 celdas de datos*/
+            /*Cada fila tendrá celdas de datos*/
             for(int c=0;c<Column;c++){
             	
             	String Value = "";
@@ -163,14 +163,16 @@ public class CollectionXLSI {
             		if (temp!=null)
             		{
             		for (CompleteElement completeElement : temp) {
+            			if (!Value.isEmpty())
+            				Value=Value+" "; 
 						if (completeElement instanceof CompleteTextElement)
-							Value=Value+" " +((CompleteTextElement)completeElement).getValue();
+							Value=Value+((CompleteTextElement)completeElement).getValue();
 						else if (completeElement instanceof CompleteLinkElement)
-							Value=Value+" " +"$"+((CompleteLinkElement)completeElement).getValue().getClavilenoid();
+							Value=Value+((CompleteLinkElement)completeElement).getValue().getClavilenoid();
 						else if (completeElement instanceof CompleteResourceElementURL)
-							Value=Value+" "+((CompleteResourceElementURL)completeElement).getValue();
+							Value=Value+((CompleteResourceElementURL)completeElement).getValue();
 						else if (completeElement instanceof CompleteResourceElementFile)
-							Value=Value+" "+((CompleteResourceElementFile)completeElement).getValue().getPath();
+							Value=Value+((CompleteResourceElementFile)completeElement).getValue().getPath();
 							
 					}
             		}
