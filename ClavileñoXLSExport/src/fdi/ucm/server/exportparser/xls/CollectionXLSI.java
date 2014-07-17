@@ -265,7 +265,7 @@ public class CollectionXLSI {
 	        int columnsMax=ListaElementos.size();
 	       	
 	        
-	        for (int i = 0; i < 2; i++) {
+	        for (int i = 0; i < 1; i++) {
 	        	Row fila = hoja.createRow(row);
 	        	row++;
 	        	
@@ -283,20 +283,13 @@ public class CollectionXLSI {
 	            		Cell celda = fila.createCell(j);
 	            		
 	            		
-	            	String Value2 = "";
 	            	if (j!=0)
 	            		{
-	            		Value2=ListaElementos.get(j-1).getClavilenoid().toString();
 	            		if (i==0)
 	            			clave.put(ListaElementos.get(j-1).getClavilenoid(), Column);
-	            		}
-	            	
-	            	if(i==0){
 	            		Column++;
 	            		celda.setCellValue(Value);
-	            	}else if (i==1){
-	            		celda.setCellValue(Value2);
-	            	}
+	            		}
 	            }
 	           }
 			}	
