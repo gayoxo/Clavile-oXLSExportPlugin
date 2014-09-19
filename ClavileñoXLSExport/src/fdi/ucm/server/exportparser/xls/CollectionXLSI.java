@@ -290,6 +290,8 @@ public class CollectionXLSI {
 	            		Column++;
 	            		celda.setCellValue(Value);
 	            		}
+	            	else 
+	            		celda.setCellValue("Id");
 	            }
 	           }
 			}	
@@ -323,12 +325,12 @@ public class CollectionXLSI {
 	            
 	            
 	            /*Cada fila tendrá celdas de datos*/
-	            for(int c=0;c<Column;c++){
+	            for(int c=0;c<=columnsMax;c++){
 	            	
 	            	String Value = "";
 	            	if (c!=0)
 	            		{
-	            		ArrayList<CompleteElement> temp = ListaClave.get(c);
+	            		ArrayList<CompleteElement> temp = ListaClave.get(c-1);
 	            		if (temp!=null)
 	            		{
 	            		for (CompleteElement completeElement : temp) {
