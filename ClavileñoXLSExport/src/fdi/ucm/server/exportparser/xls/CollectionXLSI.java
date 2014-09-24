@@ -298,6 +298,16 @@ public class CollectionXLSI {
 	            			clave.put(ListaElementos.get(j-2).getClavilenoid(), Column);
 	            		Column++;
 	            		}
+	            	else
+	            	if (j==0)
+	            	{
+	            		hoja.setColumnWidth(j, 6375);
+	            	}
+	            	else
+	            	if (j==1)
+		            {
+		            	hoja.setColumnWidth(j, 12750);
+		            }
 	            	
 	            	celda.setCellValue(Value);
 	            
