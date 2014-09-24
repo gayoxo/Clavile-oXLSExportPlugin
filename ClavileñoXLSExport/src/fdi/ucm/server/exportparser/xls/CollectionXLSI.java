@@ -273,7 +273,7 @@ public class CollectionXLSI {
 	        		
 	        		String Value = "";
 	            	if (j==0)
-	            		Value="Clavy Id";
+	            		Value="Clavy Document Id";
 	            	else 
 	            		if (j==1)
 	            			Value="Description";
@@ -284,8 +284,11 @@ public class CollectionXLSI {
 	            		}
 	
 	            	
-	            	if (Value.length()<32767)
+	            	if (Value.length()>=32767)
 	            	{
+	            		cL.getLogLines().add("Tamaño de Texto en Valor del path del Tipo " + Value + " excesivo, no debe superar los 32767 caracteres, columna recortada");
+	            		Value.substring(0, 32766);
+	            	}
 	            		Cell celda = fila.createCell(j);
 	            		
 	            		
@@ -297,7 +300,7 @@ public class CollectionXLSI {
 	            		}
 	            	
 	            	celda.setCellValue(Value);
-	            }
+	            
 	           }
 			}	
 	        
@@ -362,7 +365,8 @@ public class CollectionXLSI {
 	            	if (Value.length()>=32767)
 	            	{
 	            		Value="";
-	            		cL.getLogLines().add("Temaño de Texto en Valor en elemento " + Value + " excesivo, no debe superar los 32767 caracteres, columna ignorada");
+	            		cL.getLogLines().add("Tamaño de Texto en Valor en elemento " + Value + " excesivo, no debe superar los 32767 caracteres, columna recortada");
+	            		Value.substring(0, 32766);
 	            	}
 	                /*Creamos la celda a partir de la fila actual*/
 	                Cell celda = fila.createCell(c);               	
