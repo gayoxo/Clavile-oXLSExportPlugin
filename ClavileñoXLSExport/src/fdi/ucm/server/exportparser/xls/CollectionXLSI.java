@@ -269,29 +269,34 @@ public class CollectionXLSI {
 	        	Row fila = hoja.createRow(row);
 	        	row++;
 	        	
-	        	for (int j = 0; j <= columnsMax; j++) {
+	        	for (int j = 0; j < columnsMax+2; j++) {
 	        		
 	        		String Value = "";
-	            	if (j!=0)
+	            	if (j==0)
+	            		Value="Clavy Id";
+	            	else 
+	            		if (j==1)
+	            			Value="Description";
+	            		else
 	            		{
-	            		CompleteElementType TmpEle = ListaElementos.get(j-1);
+	            		CompleteElementType TmpEle = ListaElementos.get(j-2);
 	            		Value=pathFather(TmpEle);
 	            		}
+	
 	            	
 	            	if (Value.length()<32767)
 	            	{
 	            		Cell celda = fila.createCell(j);
 	            		
 	            		
-	            	if (j!=0)
+	            	if (j>1)
 	            		{
 	            		if (i==0)
-	            			clave.put(ListaElementos.get(j-1).getClavilenoid(), Column);
+	            			clave.put(ListaElementos.get(j-2).getClavilenoid(), Column);
 	            		Column++;
-	            		celda.setCellValue(Value);
 	            		}
-	            	else 
-	            		celda.setCellValue("Id");
+	            	
+	            	celda.setCellValue(Value);
 	            }
 	           }
 			}	
@@ -325,12 +330,16 @@ public class CollectionXLSI {
 	            
 	            
 	            /*Cada fila tendrá celdas de datos*/
-	            for(int c=0;c<=columnsMax;c++){
+	            for(int c=0;c<columnsMax+2;c++){
 	            	
 	            	String Value = "";
-	            	if (c!=0)
+	            	if (c==0)
+	            		Value=Long.toString(Doc.getClavilenoid());
+	            	else if (c==1)
+	            		Value=Doc.getDescriptionText();
+	            	else
 	            		{
-	            		ArrayList<CompleteElement> temp = ListaClave.get(c-1);
+	            		ArrayList<CompleteElement> temp = ListaClave.get(c-2);
 	            		if (temp!=null)
 	            		{
 	            		for (CompleteElement completeElement : temp) {
@@ -348,10 +357,7 @@ public class CollectionXLSI {
 						}
 	            		}
 	            		}
-	            	else
-	            		{
-	            		Value=Doc.getClavilenoid()+"";
-	            		}
+	
 	            	 
 	            	if (Value.length()>=32767)
 	            	{
@@ -360,9 +366,6 @@ public class CollectionXLSI {
 	            	}
 	                /*Creamos la celda a partir de la fila actual*/
 	                Cell celda = fila.createCell(c);               	
-	                	if (c==0)
-	                		celda.setCellValue(Value);
-	                	else
 	                		 celda.setCellValue(Value);
 	                    /*Si no es la primera fila establecemos un valor*/
 	                	//32.767
