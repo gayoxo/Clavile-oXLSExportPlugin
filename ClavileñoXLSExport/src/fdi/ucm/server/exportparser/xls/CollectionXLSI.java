@@ -273,7 +273,7 @@ public class CollectionXLSI {
 	        		
 	        		String Value = "";
 	            	if (j==0)
-	            		Value="Clavy Document Id";
+	            		Value="Id Link Renference";
 	            	else 
 	            		if (j==1)
 	            			Value="Description";
@@ -301,7 +301,7 @@ public class CollectionXLSI {
 	            	else
 	            	if (j==0)
 	            	{
-	            		hoja.setColumnWidth(j, 6375);
+	            		hoja.setColumnWidth(j, 4000);
 	            	}
 	            	else
 	            	if (j==1)
