@@ -358,14 +358,7 @@ public class CollectionXLSI {
 	            		for (CompleteElement completeElement : temp) {
 	            			if (!Value.isEmpty())
 	            				Value=Value+" "; 
-							if (completeElement instanceof CompleteTextElement)
-								Value=Value+((CompleteTextElement)completeElement).getValue();
-							else if (completeElement instanceof CompleteLinkElement)
-								Value=Value+((CompleteLinkElement)completeElement).getValue().getClavilenoid();
-							else if (completeElement instanceof CompleteResourceElementURL)
-								Value=Value+((CompleteResourceElementURL)completeElement).getValue();
-							else if (completeElement instanceof CompleteResourceElementFile)
-								Value=Value+((CompleteResourceElementFile)completeElement).getValue().getPath();
+	            			Value=Value+getValueFromElement(completeElement);
 								
 						}
 	            		}
@@ -444,6 +437,22 @@ public class CollectionXLSI {
 		 return ListaElementos;
 	}
 
+	private static String getValueFromElement(CompleteElement completeElement) {
+		try {
+			if (completeElement instanceof CompleteTextElement)
+    			return (((CompleteTextElement)completeElement).getValue());
+			else if (completeElement instanceof CompleteLinkElement)
+				return Long.toString((((CompleteLinkElement)completeElement).getValue().getClavilenoid()));
+			else if (completeElement instanceof CompleteResourceElementURL)
+				return (((CompleteResourceElementURL)completeElement).getValue());
+			else if (completeElement instanceof CompleteResourceElementFile)
+				return (((CompleteResourceElementFile)completeElement).getValue().getPath());
+		} catch (Exception e) {
+			return "";
+		}
+		return "";
+	}
+	
 	public static void main(String[] args) throws Exception{
 		
 		int id=0;
