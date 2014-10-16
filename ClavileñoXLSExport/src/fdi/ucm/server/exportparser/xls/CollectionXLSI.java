@@ -237,8 +237,19 @@ public class CollectionXLSI {
 			HashMap<Long, Integer> clave, CompleteCollectionLog cL, List<CompleteDocuments> list, boolean soloEstructura) {
 		  
 		   Sheet hoja;
+		   
+		   
 		if (!grammar.getNombre().isEmpty())
-	        	 hoja = libro.createSheet(grammar.getNombre());
+	        	 {
+					int indice = 0;
+					String Nombreactual=grammar.getNombre();
+					while (libro.getSheet(Nombreactual)!=null)
+						{
+						Nombreactual=grammar.getNombre()+indice;
+						indice++;
+						}
+					hoja = libro.createSheet(Nombreactual);
+	        	 }
 	        else hoja = libro.createSheet();
 	  
 	        
