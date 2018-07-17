@@ -4,14 +4,14 @@
 package fdi.ucm.server.exportparser.xls;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Random;
-
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -22,9 +22,7 @@ import fdi.ucm.server.modelComplete.collection.CompleteCollection;
 import fdi.ucm.server.modelComplete.collection.CompleteLogAndUpdates;
 import fdi.ucm.server.modelComplete.collection.document.CompleteDocuments;
 import fdi.ucm.server.modelComplete.collection.document.CompleteElement;
-import fdi.ucm.server.modelComplete.collection.document.CompleteFile;
 import fdi.ucm.server.modelComplete.collection.document.CompleteLinkElement;
-import fdi.ucm.server.modelComplete.collection.document.CompleteResourceElement;
 import fdi.ucm.server.modelComplete.collection.document.CompleteResourceElementFile;
 import fdi.ucm.server.modelComplete.collection.document.CompleteResourceElementURL;
 import fdi.ucm.server.modelComplete.collection.document.CompleteTextElement;
@@ -32,7 +30,6 @@ import fdi.ucm.server.modelComplete.collection.grammar.CompleteElementType;
 import fdi.ucm.server.modelComplete.collection.grammar.CompleteGrammar;
 import fdi.ucm.server.modelComplete.collection.grammar.CompleteLinkElementType;
 import fdi.ucm.server.modelComplete.collection.grammar.CompleteResourceElementType;
-import fdi.ucm.server.modelComplete.collection.grammar.CompleteStructure;
 import fdi.ucm.server.modelComplete.collection.grammar.CompleteTextElementType;
 
 /**
@@ -273,10 +270,11 @@ public class CollectionXLSI {
 	private static ArrayList<CompleteElementType> generaLista(
 			CompleteGrammar completegramar) {
 		 ArrayList<CompleteElementType> ListaElementos = new ArrayList<CompleteElementType>();
-		 for (CompleteStructure completeelem : completegramar.getSons()) {
+		 for (CompleteElementType completeelem : completegramar.getSons()) {
 			 	if (completeelem instanceof CompleteElementType)
 			 		{
-			 		if (completeelem instanceof CompleteTextElementType||completeelem instanceof CompleteLinkElementType||completeelem instanceof CompleteResourceElementType)
+			 		if (completeelem instanceof CompleteTextElementType||completeelem instanceof CompleteLinkElementType||completeelem instanceof CompleteResourceElementType
+			 				&&(!StaticFuctionsXLS.isIgnored((CompleteElementType)completeelem)))
 			 			ListaElementos.add((CompleteElementType)completeelem);
 			 		}
 				ListaElementos.addAll(generaLista(completeelem));
@@ -285,12 +283,13 @@ public class CollectionXLSI {
 	}
 
 	private static Collection<? extends CompleteElementType> generaLista(
-			CompleteStructure completeelementPadre) {
+			CompleteElementType completeelementPadre) {
 		 ArrayList<CompleteElementType> ListaElementos = new ArrayList<CompleteElementType>();
-		 for (CompleteStructure completeelem : completeelementPadre.getSons()) {
+		 for (CompleteElementType completeelem : completeelementPadre.getSons()) {
 			 	if (completeelem instanceof CompleteElementType)
 			 		{
-			 		if (completeelem instanceof CompleteTextElementType||completeelem instanceof CompleteLinkElementType||completeelem instanceof CompleteResourceElementType)
+			 		if (completeelem instanceof CompleteTextElementType||completeelem instanceof CompleteLinkElementType||completeelem instanceof CompleteResourceElementType
+			 				&&(!StaticFuctionsXLS.isIgnored((CompleteElementType)completeelem)))
 			 			ListaElementos.add((CompleteElementType)completeelem);
 			 		}
 				ListaElementos.addAll(generaLista(completeelem));
@@ -315,97 +314,50 @@ public class CollectionXLSI {
 	}
 	
 	public static void main(String[] args) throws Exception{
+	
 		
-		int id=0;
+		String message="Exception .clavy-> Params Null ";
+		try {
+
+			
+			
+			String fileName = "test.clavy";
+			 System.out.println(fileName);
+			 
+
+			 File file = new File(fileName);
+			 FileInputStream fis = new FileInputStream(file);
+			 ObjectInputStream ois = new ObjectInputStream(fis);
+			 CompleteCollection object = (CompleteCollection) ois.readObject();
+			 
+			 
+			 try {
+				 ois.close();
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
+			
+			 try {
+				 fis.close();
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
+			 
+			 
 		
-		
-		
-		  CompleteCollection CC=new CompleteCollection("Lou Arreglate", "Arreglate ya!");
-		  for (int i = 0; i < 5; i++) {
-			  CompleteGrammar G1 = new CompleteGrammar(new Long(id),"Grammar"+i, i+"", CC);
-			  
-			  ArrayList<CompleteDocuments> CD=new ArrayList<CompleteDocuments>();
-			  int docsN=(new Random()).nextInt(5);
-			  docsN=docsN+5;
-			for (int j = 0; j < docsN; j++) {
-				CompleteDocuments CDDD=new CompleteDocuments(new Long(id), CC, "", "");
-				CC.getEstructuras().add(CDDD);
-				 id++;
-				CD.add(CDDD);
-			}
-			  
-			  id++;
-			  for (int j = 0; j < 5; j++) {
-				  CompleteElementType CX = new CompleteElementType(new Long(id),"Structure "+(i*10+j), G1);
-				  id++;
-				G1.getSons().add(CX);
-			}
-			  for (int j = 0; j < 5; j++) {
-				  CompleteTextElementType CX = new CompleteTextElementType(new Long(id),"Texto "+(i*10+j), G1);
-				  id++;
-				G1.getSons().add(CX);
-				
-				for (CompleteDocuments completeDocuments : CD) {
-					boolean docrep=(new Random()).nextBoolean();
-					if (docrep)
-						{
-						CompleteTextElement CTE=new CompleteTextElement(new Long(id), CX, "Texto "+(i*10+j));
-						id++;
-						completeDocuments.getDescription().add(CTE);
-						}
-				}
-				
-				
-				
-			}
-			  for (int j = 0; j < 5; j++) {
-				  CompleteLinkElementType CX = new CompleteLinkElementType(new Long(id),"Link "+(i*10+j), G1);
-				  id++;
-				G1.getSons().add(CX);
-				
-				for (CompleteDocuments completeDocuments : CD) {
-					boolean docrep=(new Random()).nextBoolean();
-					if (docrep)
-						{
-						CompleteLinkElement CTE=new CompleteLinkElement(new Long(id), CX, CD.get((new Random()).nextInt(CD.size())));
-						id++;
-						completeDocuments.getDescription().add(CTE);
-						}
-				}
-			}
-			  for (int j = 0; j < 5; j++) {
-				  CompleteResourceElementType CX = new CompleteResourceElementType(new Long(id),"Resource "+(i*10+j), G1);
-				  id++;
-				G1.getSons().add(CX);
-				
-				for (CompleteDocuments completeDocuments : CD) {
-					boolean docrep=(new Random()).nextBoolean();
-					if (docrep)
-						{
-						
-						boolean URL=(new Random()).nextBoolean();
-						CompleteResourceElement CTE;
-						if (URL)
-							CTE=new CompleteResourceElementURL(new Long(id), CX, "URL "+(i*10+j));
-						else 
-							{
-							CompleteFile FF = new CompleteFile(new Long(id), "Path File "+(i*10+j), CC);
-							CC.getSectionValues().add(FF);
-							id++;
-							CTE=new CompleteResourceElementFile(new Long(id), CX, FF);
-							}
-						id++;
-						completeDocuments.getDescription().add(CTE);
-						}
-				}
-				
-			}
-			  CC.getMetamodelGrammar().add(G1);
-		}
 		 
 		  
 		  
-		  processCompleteCollection(new CompleteLogAndUpdates(), CC, false, System.getProperty("user.home"));
+			 processCompleteCollection(new CompleteLogAndUpdates(), object, false, System.getProperty("user.home"));
+			 
+	    }catch (Exception e) {
+			e.printStackTrace();
+			System.err.println(message);
+			throw new RuntimeException(message);
+		}
+		  
+		  
+		 
 		  
 	    }
 
@@ -414,12 +366,10 @@ public class CollectionXLSI {
 	 *  Retorna el Texto que representa al path.
 	 *  @return Texto cadena para el elemento
 	 */
-	public static String pathFather(CompleteStructure entrada)
+	public static String pathFather(CompleteElementType entrada)
 	{
-		String DataShow;
-		if (entrada instanceof CompleteElementType)
-			DataShow= ((CompleteElementType) entrada).getName();
-		else DataShow= "*";
+		String DataShow= ((CompleteElementType) entrada).getName();
+
 		
 		if (entrada.getFather()!=null)
 			return pathFather(entrada.getFather())+"/"+DataShow;

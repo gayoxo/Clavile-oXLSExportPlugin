@@ -9,7 +9,9 @@ package fdi.ucm.server.exportparser.xls;
  *
  */
 public class NameConstantsXLS {
-
-	
+	//META
+	public static final String META = "Meta";
+	public static final String TYPE = "Type";
+	public static final String IGNORED = "IGNORED";
 		
 }
