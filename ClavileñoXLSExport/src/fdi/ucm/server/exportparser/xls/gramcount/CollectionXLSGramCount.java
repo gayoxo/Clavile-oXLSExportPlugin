@@ -116,9 +116,9 @@ public class CollectionXLSGramCount {
 				row++;
 				Cell celda01 = fila.createCell(0);
 				celda01.setCellValue(completeDocuments.getClavilenoid());
-				Cell celda11 = filaH.createCell(1);
+				Cell celda11 = fila.createCell(1);
 				celda11.setCellValue(completeDocuments.getDescriptionText());
-				Cell celda21 = filaH.createCell(2);
+				Cell celda21 = fila.createCell(2);
 				celda21.setCellValue(ContadorValidosEnGramatica);		
 			}
 
@@ -200,7 +200,7 @@ public static void main(String[] args) throws Exception{
 			String fileName = "test.clavy";
 			
 			if (args.length!=0)
-				fileName=args[1];
+				fileName=args[0];
 			
 			System.out.println(fileName);
 			 
