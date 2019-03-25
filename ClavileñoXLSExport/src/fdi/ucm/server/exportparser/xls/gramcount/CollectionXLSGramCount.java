@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
@@ -20,6 +21,8 @@ import fdi.ucm.server.modelComplete.collection.CompleteCollection;
 import fdi.ucm.server.modelComplete.collection.CompleteLogAndUpdates;
 import fdi.ucm.server.modelComplete.collection.document.CompleteDocuments;
 import fdi.ucm.server.modelComplete.collection.document.CompleteElement;
+import fdi.ucm.server.modelComplete.collection.document.CompleteResourceElement;
+import fdi.ucm.server.modelComplete.collection.document.CompleteTextElement;
 import fdi.ucm.server.modelComplete.collection.grammar.CompleteElementType;
 import fdi.ucm.server.modelComplete.collection.grammar.CompleteGrammar;
 import fdi.ucm.server.modelComplete.collection.grammar.CompleteOperationalValueType;
@@ -55,13 +58,13 @@ public class CollectionXLSGramCount {
         	}
 		}
         
-        int ImagenesCount=0;
+        HashSet<String> ImagenesCount=new HashSet<>();
         
         for (Entry<CompleteGrammar, List<CompleteElementType>> entryGram : GramarElem.entrySet()) {
-        	ImagenesCount=ImagenesCount+procesaHoja(entryGram.getKey().getNombre(),entryGram.getValue(),libro,cL,salvar.getEstructuras());
+        	procesaHoja(entryGram.getKey().getNombre(),entryGram.getValue(),libro,cL,salvar.getEstructuras(),ImagenesCount);
 		}
         
-        System.out.println(ImagenesCount);
+        System.out.println(ImagenesCount.size());
  
         libro.write(archivo);
 
@@ -74,9 +77,8 @@ public class CollectionXLSGramCount {
 
 	
 	
-	private static int procesaHoja(String nombre, List<CompleteElementType> listValidos, Workbook libro,
-			CompleteLogAndUpdates cL, List<CompleteDocuments> documentos) {
-		int Salida = 0;
+	private static void procesaHoja(String nombre, List<CompleteElementType> listValidos, Workbook libro,
+			CompleteLogAndUpdates cL, List<CompleteDocuments> documentos, HashSet<String> imagenesCount) {
 
 		Sheet hoja;
 		hoja = libro.createSheet(nombre);
@@ -102,7 +104,7 @@ public class CollectionXLSGramCount {
 				if (listValidos.contains(elemento.getHastype())&&
 						elemento.getHastype() instanceof CompleteResourceElementType &&
 						!isNoImage(elemento.getHastype()))
-					Salida++;
+					imagenesCount.add(((CompleteResourceElement)elemento).getValue());
 
 			if (ContadorValidosEnGramatica>0)
 			{
@@ -118,7 +120,6 @@ public class CollectionXLSGramCount {
 
 		}
 
-		return Salida;
 
 	}
 
