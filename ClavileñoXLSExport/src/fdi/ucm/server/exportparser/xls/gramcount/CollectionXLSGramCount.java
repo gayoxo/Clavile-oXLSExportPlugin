@@ -21,8 +21,8 @@ import fdi.ucm.server.modelComplete.collection.CompleteCollection;
 import fdi.ucm.server.modelComplete.collection.CompleteLogAndUpdates;
 import fdi.ucm.server.modelComplete.collection.document.CompleteDocuments;
 import fdi.ucm.server.modelComplete.collection.document.CompleteElement;
-import fdi.ucm.server.modelComplete.collection.document.CompleteResourceElement;
-import fdi.ucm.server.modelComplete.collection.document.CompleteTextElement;
+import fdi.ucm.server.modelComplete.collection.document.CompleteResourceElementFile;
+import fdi.ucm.server.modelComplete.collection.document.CompleteResourceElementURL;
 import fdi.ucm.server.modelComplete.collection.grammar.CompleteElementType;
 import fdi.ucm.server.modelComplete.collection.grammar.CompleteGrammar;
 import fdi.ucm.server.modelComplete.collection.grammar.CompleteOperationalValueType;
@@ -104,7 +104,11 @@ public class CollectionXLSGramCount {
 				if (listValidos.contains(elemento.getHastype())&&
 						elemento.getHastype() instanceof CompleteResourceElementType &&
 						!isNoImage(elemento.getHastype()))
-					imagenesCount.add(((CompleteResourceElement)elemento).getValue());
+					if (elemento instanceof CompleteResourceElementFile )
+						imagenesCount.add(((CompleteResourceElementFile)elemento).getValue().getPath());
+					else
+						if (elemento instanceof CompleteResourceElementURL )
+							imagenesCount.add(((CompleteResourceElementURL)elemento).getValue());
 
 			if (ContadorValidosEnGramatica>0)
 			{
