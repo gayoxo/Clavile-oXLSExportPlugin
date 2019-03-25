@@ -163,7 +163,11 @@ public static void main(String[] args) throws Exception{
 			
 			
 			String fileName = "test.clavy";
-			 System.out.println(fileName);
+			
+			if (args.length!=0)
+				fileName=args[1];
+			
+			System.out.println(fileName);
 			 
 
 			 File file = new File(fileName);

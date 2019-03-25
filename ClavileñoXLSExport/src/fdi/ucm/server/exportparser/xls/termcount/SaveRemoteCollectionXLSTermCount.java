@@ -83,7 +83,7 @@ public class SaveRemoteCollectionXLSTermCount extends SaveCollection {
 	 */
 	@Override
 	public String getName() {
-		return "XLS";
+		return "XLS Conteo";
 	}
 	
 	

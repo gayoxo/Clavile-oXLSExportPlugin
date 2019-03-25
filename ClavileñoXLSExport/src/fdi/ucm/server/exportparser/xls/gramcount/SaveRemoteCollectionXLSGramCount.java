@@ -83,7 +83,7 @@ public class SaveRemoteCollectionXLSGramCount extends SaveCollection {
 	 */
 	@Override
 	public String getName() {
-		return "XLS";
+		return "XLS Conteo por gramatica";
 	}
 	
 	
