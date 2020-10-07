@@ -324,7 +324,15 @@ public class CollectionXLSI {
 			String fileName = "test.clavy";
 			
 			if (args.length!=0)
-				fileName=args[1];
+				fileName=args[0];
+			
+			boolean soloestruct=false;
+			if (args.length>1)
+				try {
+					soloestruct=Boolean.parseBoolean(args[1]);
+				} catch (Exception e) {
+					
+				}
 			
 			System.out.println(fileName);
 			 
@@ -352,7 +360,7 @@ public class CollectionXLSI {
 		 
 		  
 		  
-			 processCompleteCollection(new CompleteLogAndUpdates(), object, false, System.getProperty("user.home"));
+			 processCompleteCollection(new CompleteLogAndUpdates(), object, soloestruct, System.getProperty("user.home"));
 			 
 	    }catch (Exception e) {
 			e.printStackTrace();
@@ -377,7 +385,7 @@ public class CollectionXLSI {
 		
 		if (entrada.getFather()!=null)
 			return pathFather(entrada.getFather())+"/"+DataShow;
-		else return entrada.getCollectionFather().getNombre()+"/"+DataShow;
+		else return DataShow;
 	}
 	
 }
